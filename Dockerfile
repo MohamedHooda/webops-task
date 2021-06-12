@@ -1,16 +1,30 @@
 FROM ruby:3.0.1
 
-RUN apk update && apk upgrade && apk add ruby ruby-json ruby-io-console ruby-bundler ruby-irb ruby-bigdecimal tzdata postgresql-dev && apk add nodejs && apk add curl-dev ruby-dev build-base libffi-dev && apk add build-base libxslt-dev libxml2-dev ruby-rdoc mysql-dev sqlite-dev
+# install rails dependencies
+RUN apt-get clean all && apt-get update -qq && apt-get install -y build-essential libpq-dev \
+    curl gnupg2 apt-utils default-libmysqlclient-dev git libcurl3-dev cmake \
+    libssl-dev pkg-config openssl imagemagick file nodejs yarn npm netcat
 
-RUN mkdir /app
-WORKDIR /app
+RUN npm install --global yarn
 
-COPY Gemfile Gemfile.lock ./
-RUN gem install ovirt-engine-sdk -v '4.3.0' --source 'https://rubygems.org/'
-RUN bundle install --binstubs
 
-COPY . .
+RUN mkdir /rails-app
+WORKDIR /rails-app
 
-EXPOSE 3000
+# Adding gems
+COPY Gemfile Gemfile
+COPY Gemfile.lock Gemfile.lock
+RUN bundle install
+RUN yarn install --check-files
 
-ENTRYPOINT ["sh", "./config/docker/startup.sh"]
+
+COPY . /rails-app
+
+# Add a script to be executed every time the container starts.
+COPY startup.sh /usr/bin/
+COPY ./config/docker/asset-pre-compile.sh /usr/bin/
+COPY ./config/docker/prepare-db.sh /usr/bin/
+RUN chmod +x /usr/bin/startup.sh
+RUN chmod +x /usr/bin/asset-pre-compile.sh
+RUN chmod +x /usr/bin/prepare-db.sh
+ENTRYPOINT ["startup.sh"]

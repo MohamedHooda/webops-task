@@ -18,7 +18,7 @@ class PostsController < ApplicationController
             puts user_id.inspect
 
             @post = Post.create(body:body, title:title, author_id: user_id, tags:tags)
-            PostWorker.perform_at(24.hours.from_now, @post.id)
+            PostWorker.perform_at(1.minutes.from_now, @post.id)
             render json: {data: {post_id:@post.id, title:@post.title, body:@post.body, tags:@post.tags}}
     
         end
@@ -58,6 +58,20 @@ class PostsController < ApplicationController
     def delete
         @post.destroy
         render json: {data: "deleted successfully"}
+    end
+
+    def get
+        posts = Post.all()
+        posts_response = []
+        for i in posts
+            post_id = i.id
+            author_id = i.author_id
+            body = i.body
+            title = i.title
+            
+            posts_response.append({post_id:post_id, title:title, body:body, title:title})
+        end
+        render json:{data:posts_response}
     end
 
     private

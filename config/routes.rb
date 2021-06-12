@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resource :posts, only: [:create]
   post "/posts/update", to: "posts#update"
   post "/posts/delete", to: "posts#delete"
+  get "/posts", to: "posts#get"
 
   resource :comments, only: [:create]
   post "/comments/update", to: "comments#update"

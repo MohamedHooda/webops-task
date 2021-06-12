@@ -1,7 +1,13 @@
 #! /bin/sh
 
-# Wait for DB services
-sh ./config/docker/wait-for-services.sh
+
+
+set -e
+
+# Remove a potentially pre-existing server.pid for Rails.
+rm -f /rails-app/tmp/pids/server.pid
+
+# exec "$@"
 
 # Prepare DB (Migrate - If not? Create db & Migrate)
 sh ./config/docker/prepare-db.sh
@@ -10,4 +16,4 @@ sh ./config/docker/prepare-db.sh
 sh ./config/docker/asset-pre-compile.sh
 
 # Start Application
-bundle exec puma -C config/puma.rb
+# bundle exec puma -C config/puma.rb
