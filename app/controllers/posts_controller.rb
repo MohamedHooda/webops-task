@@ -18,7 +18,7 @@ class PostsController < ApplicationController
             puts user_id.inspect
 
             @post = Post.create(body:body, title:title, author_id: user_id, tags:tags)
-            PostWorker.perform_at(1.minutes.from_now, @post.id)
+            PostWorker.perform_at(24.hours.from_now, @post.id)
             render json: {data: {post_id:@post.id, title:@post.title, body:@post.body, tags:@post.tags}}
     
         end
