@@ -1,30 +1,49 @@
-FROM ruby:3.0.1
+FROM ruby:2.5.1-alpine
 
-# install rails dependencies
-RUN apt-get clean all && apt-get update -qq && apt-get install -y build-essential libpq-dev \
-    curl gnupg2 apt-utils default-libmysqlclient-dev git libcurl3-dev cmake \
-    libssl-dev pkg-config openssl imagemagick file nodejs yarn npm netcat
+ENV BUNDLER_VERSION=2.0.2
 
-RUN npm install --global yarn
+RUN apk add --update --no-cache \
+      binutils-gold \
+      build-base \
+      curl \
+      file \
+      g++ \
+      gcc \
+      git \
+      less \
+      libstdc++ \
+      libffi-dev \
+      libc-dev \
+      linux-headers \
+      libxml2-dev \
+      libxslt-dev \
+      libgcrypt-dev \
+      make \
+      netcat-openbsd \
+      nodejs \
+      openssl \
+      pkgconfig \
+      postgresql-dev \
+      python \
+      tzdata \
+      yarn
 
+RUN gem install bundler -v 2.0.2
 
-RUN mkdir /rails-app
-WORKDIR /rails-app
+WORKDIR /app
 
-# Adding gems
-COPY Gemfile Gemfile
-COPY Gemfile.lock Gemfile.lock
-RUN bundle install
+COPY Gemfile Gemfile.lock ./
+
+RUN bundle config build.nokogiri --use-system-libraries
+
+RUN bundle check || bundle install
+
+COPY package.json yarn.lock ./
+
 RUN yarn install --check-files
 
+COPY . ./
 
-COPY . /rails-app
+RUN bundle exec rake webpacker:compile
 
-# Add a script to be executed every time the container starts.
-COPY startup.sh /usr/bin/
-COPY ./config/docker/asset-pre-compile.sh /usr/bin/
-COPY ./config/docker/prepare-db.sh /usr/bin/
-RUN chmod +x /usr/bin/startup.sh
-RUN chmod +x /usr/bin/asset-pre-compile.sh
-RUN chmod +x /usr/bin/prepare-db.sh
-ENTRYPOINT ["startup.sh"]
+CMD ["./entrypoints/docker-entrypoint.sh"]
