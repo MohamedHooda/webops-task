@@ -25,11 +25,9 @@ RUN apk add --update --no-cache \
       postgresql-dev \
       python \
       tzdata \
-      yarn \
-      mysql \
-      mysql-client
+      yarn 
 
-RUN apk update && apk upgrade && apk add ruby ruby-json ruby-io-console ruby-bundler ruby-irb ruby-bigdecimal tzdata postgresql-dev && apk add nodejs && apk add curl-dev ruby-dev build-base libffi-dev && apk add build-base libxslt-dev libxml2-dev ruby-rdoc mysql-dev sqlite-dev
+RUN apk update && apk upgrade && apk add ruby ruby-json ruby-io-console ruby-bundler ruby-irb ruby-bigdecimal tzdata postgresql-dev && apk add nodejs-current && apk add curl-dev ruby-dev build-base libffi-dev && apk add build-base libxslt-dev libxml2-dev ruby-rdoc mysql-dev sqlite-dev
 
 
 
@@ -44,11 +42,15 @@ RUN bundle config build.nokogiri --use-system-libraries
 RUN bundle check || bundle install
 
 COPY package.json yarn.lock ./
+# COPY /var/run/mysqld/mysqld.sock /host/mysql/mysqld.sock
 
 # RUN yarn install --check-files
 
 COPY . ./
 
 RUN bundle exec rake webpacker:compile
+RUN chmod +x ./entrypoints/docker-entrypoint.sh
+RUN chmod +x ./entrypoints/prepare-db.sh
+RUN chmod +x ./entrypoints/sidekiq-entrypoint.sh
 
-CMD ["./entrypoints/docker-entrypoint.sh"]
+CMD ["sh","./entrypoints/docker-entrypoint.sh"]
