@@ -1,7 +1,8 @@
 class PostWorker
   include Sidekiq::Worker
-
-  def perform(id)
+  sidekiq_options retry: false
+  
+  def perform(id, token)
     # Do something
     puts "heyy testing".inspect
     post = Post.find_by(id:id)

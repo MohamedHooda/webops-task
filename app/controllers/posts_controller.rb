@@ -18,7 +18,8 @@ class PostsController < ApplicationController
             puts user_id.inspect
 
             @post = Post.create(body:body, title:title, author_id: user_id, tags:tags)
-            PostWorker.perform_at(24.hours.from_now, @post.id)
+            puts request.headers['Authorization'].inspect
+            PostWorker.perform_at(1.seconds.from_now, @post.id, request.headers['Authorization'].split(' ')[1])
             render json: {data: {post_id:@post.id, title:@post.title, body:@post.body, tags:@post.tags}}
     
         end
@@ -56,6 +57,8 @@ class PostsController < ApplicationController
     end
 
     def delete
+        puts "ana hena??".inspect
+        puts @post.inspect
         @post.destroy
         render json: {data: "deleted successfully"}
     end
@@ -63,6 +66,8 @@ class PostsController < ApplicationController
     def get
         posts = Post.all()
         posts_response = []
+        puts request.headers['Authorization'].inspect
+
         for i in posts
             post_id = i.id
             author_id = i.author_id
@@ -81,6 +86,8 @@ class PostsController < ApplicationController
     end
 
     def authorize_post
+        puts "authorized".inspect
+
         @post = Post.find_by(id:params[:post_id])
         if !@post
             render json: { error: "post not found" }

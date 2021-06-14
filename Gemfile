@@ -25,7 +25,7 @@ gem 'jwt'
 # sidekiq
 gem 'sidekiq', '~> 6.1.3'
 
-
+gem 'rack-cors'
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 

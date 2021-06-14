@@ -8,7 +8,7 @@ default: &default
   password: <%= ENV['DB_PASSWORD'] %>
   port: <%= ENV['DB_PORT'] %>
   host: <%= ENV['DB_HOST'] %>
-  socket: /var/run/mysqld/mysqlx.sock
+  # socket: /var/run/mysqld/mysqlx.sock
 
 development:
   <<: *default

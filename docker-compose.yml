@@ -29,6 +29,7 @@ services:
       DB_USERNAME: root
       DB_PASSWORD: root
       DB_NAME: sample
+      DB_DATABASE: sample
       DB_PORT: 3306
       DB_HOST: db
       RAILS_ENV: development
@@ -42,10 +43,14 @@ services:
     ports:
       - '3000:3000'
     depends_on:
-      - 'db'
-      - 'redis'
+      - db
+      - redis
+    expose:
+      - '3000'
+
   db:
     image: 'mysql:5.7'
+    platform: linux/x86_64
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -80,11 +85,16 @@ services:
       REDIS_URL: redis://redis:6379/0
       REDIS_HOST: redis
     entrypoint: sh ./entrypoints/sidekiq-entrypoint.sh
-    links: 
-      - db:mysql
+    # links:
+    #   - app
+
+    # network_mode: 'host'
 
 volumes:
   # bundle:
   db:
   gem_cache:
   node_modules:
+
+    # Use a custom driver
+    # driver: overlay2
