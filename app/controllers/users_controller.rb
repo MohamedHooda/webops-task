@@ -7,14 +7,16 @@ class UsersController < ApplicationController
       @user_exists = User.find_by(email: params[:email])
 
 
+
       if @user_exists
         render json: {error: "Email already exists"}
       else  
-        @user = User.create(user_params)
-
+        @user = User.create(email: params[:email], password: params[:password], name: params[:name])
+        @user.image.attach(params[:image])
+        # puts @user.inspect
         if @user.valid?
           token = encode_token({user_id: @user.id})
-          render json: {email:@user.email, name:@user.name, image:@user.image, token: token}
+          render json: {email:@user.email, name:@user.name, token: token}
         else
           render json: {error: "Invalid email or password"}
         end
@@ -38,7 +40,7 @@ class UsersController < ApplicationController
     private
   
     def user_params
-      params.permit(:email, :password, :image, :name)
+      params.permit(:email, :password, :name)
     end
   
   end

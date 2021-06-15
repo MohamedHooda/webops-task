@@ -7,3 +7,4 @@ if [ -f tmp/pids/server.pid ]; then
 fi
 gem install rack-cors
 bundle exec sidekiq
+find . -name mysqlx.sock

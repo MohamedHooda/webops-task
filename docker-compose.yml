@@ -84,9 +84,12 @@ services:
       RAILS_ENV: development
       REDIS_URL: redis://redis:6379/0
       REDIS_HOST: redis
+
     entrypoint: sh ./entrypoints/sidekiq-entrypoint.sh
-    # links:
-    #   - app
+
+    links:
+      - app
+      - db
 
     # network_mode: 'host'
 

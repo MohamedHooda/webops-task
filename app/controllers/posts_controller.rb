@@ -19,7 +19,7 @@ class PostsController < ApplicationController
 
             @post = Post.create(body:body, title:title, author_id: user_id, tags:tags)
             puts request.headers['Authorization'].inspect
-            PostWorker.perform_at(1.seconds.from_now, @post.id, request.headers['Authorization'].split(' ')[1])
+            PostWorker.perform_at(24.hours.from_now, @post.id, request.headers['Authorization'].split(' ')[1])
             render json: {data: {post_id:@post.id, title:@post.title, body:@post.body, tags:@post.tags}}
     
         end
